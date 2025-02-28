@@ -10,5 +10,15 @@ pipeline {
                 sh 'npm -v'
             }
         }
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm install'
+            }
+        }
+        stage('Run Unit Tests') {
+            steps {
+                sh 'npm test'
+            }
+        }
     }
 }
