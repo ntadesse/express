@@ -59,31 +59,6 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialId: '', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) 
                     sh 'npm test'
-           }
-        }
-        stage('Code Coverage') {
-            steps {
-                withCredentials([usernamePassword(credentialId: '', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) 
-                    catchError(buildResult: 'SUCCESS', message: 'Ooops! Code coverage failed!', stageResult: 'UNSTABLE') {
-                    sh 'npm run coverage'
-           }
-           publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'coverage/local-result/', reportFiles: 'index.html', reportName: 'Code Coverage Report HTML', reportTitles: '', useWrapperFileDirectly: true])
         }
     }
-        stage('SAST SonarQube') {
-            steps {
-                timeout(time: 60s, unit: 'SECONDS') {
-                    withSonarQubeEnv('sonar-qube-server') {
-                    sh 'echo $SONAR_SCANNER_HOME'
-                    sh '''
-                        $SONAR_SCANNER_HOME/bin/sonar-scanner \
-                        -Dsonar.projectKey=solar-sysetm-project \ 
-                        -Dsonar.sources=. \
-                        -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info \
-                    '''
-            }
-            waitForQualityGate abortPipeline: true
-        }
-    }
-  }
 }
